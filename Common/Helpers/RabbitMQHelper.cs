@@ -1,0 +1,81 @@
+﻿using Common.Helpers.IHelpers;
+using Newtonsoft.Json;
+using RabbitMQ.Client;
+using RabbitMQ.Client.Events;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace Common
+{
+    public class RabbitMQHelper : IMessageQueueHelper
+    {
+        public void PushMessage<T>(IApplicationConfig config, T message)
+        {
+            var factory = new ConnectionFactory() { HostName = config.RabbitConnection };
+
+            using (var connection = factory.CreateConnection())
+            using (var channel = connection.CreateModel())
+            {
+                channel.QueueDeclare(queue: config.QueueName, durable: false, exclusive: false,
+                                     autoDelete: false, arguments: null);
+
+                var body = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message));
+
+                var properties = channel.CreateBasicProperties();
+                properties.Persistent = true;
+
+                channel.BasicPublish(exchange: "", routingKey: config.QueueName, basicProperties: properties, body: body);
+            }
+        }
+
+        public async Task ReadMessages<T>(IApplicationConfig config, Action<T> actionOnReceive)
+        {
+            var factory = new ConnectionFactory() { HostName = config.RabbitConnection };
+            using (var connection = factory.CreateConnection())
+            {
+                using (var channel = connection.CreateModel())
+                {
+                    channel.QueueDeclare(queue: config.QueueName, durable: false, exclusive: false, autoDelete: false, arguments: null);
+
+                    var consumer = new EventingBasicConsumer(channel);
+
+                    consumer.Received += (model, ea) =>
+                    {
+                        var body = ea.Body;
+                        var message = JsonConvert.DeserializeObject<T>(Encoding.UTF8.GetString(body));
+                        actionOnReceive.Invoke(message);
+                    };
+
+                    do
+                    {
+                        channel.BasicConsume(queue: config.QueueName,
+                                             autoAck: true,
+                                             consumer: consumer);
+
+                        await Task.Delay(10);
+                    } while (true);
+                }
+            }
+        }
+
+        private byte[] ObjectToByteArray(object obj)
+        {
+            if (obj == null)
+                return null;
+
+            BinaryFormatter bf = new BinaryFormatter();
+
+            using (MemoryStream ms = new MemoryStream())
+            {
+                bf.Serialize(ms, obj);
+                return ms.ToArray();
+            }
+        }
+    }
+}
