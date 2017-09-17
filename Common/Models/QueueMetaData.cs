@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using static Common.Constants;
 
 namespace Common.Models
 {
@@ -12,5 +13,6 @@ namespace Common.Models
         public bool IsActive { get; set; }
         public Guid? CurrentAgent { get; set; }
         public Guid ClientID { get; set; }
+        public MessageFunctionType Function {get;set;}
     }
 }

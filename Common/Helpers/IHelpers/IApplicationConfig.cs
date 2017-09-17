@@ -10,5 +10,6 @@ namespace Common.Helpers.IHelpers
     {
         string RabbitConnection { get; }
         string QueueName { get; }
+        string RedisServerName { get; }
     }
 }

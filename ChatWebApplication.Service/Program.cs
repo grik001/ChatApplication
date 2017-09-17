@@ -26,7 +26,21 @@ namespace ChatWebApplication.Service
         public static void ProcessQueue(QueueMetaData queueMetaData)
         {
             Console.WriteLine(queueMetaData.ChatEntryTime);
-        }
 
+            if (queueMetaData.Function == Constants.MessageFunctionType.Start)
+            {
+
+            }
+
+            if (queueMetaData.Function == Constants.MessageFunctionType.Stop)
+            {
+
+            }
+
+            if (queueMetaData.Function == Constants.MessageFunctionType.Update)
+            {
+
+            }
+        }
     }
 }
