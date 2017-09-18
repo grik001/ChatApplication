@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Common.Helpers
 {
-    public class RedisHelper
+    public class RedisHelper : ICacheHelper
     {
         IApplicationConfig _applicationConfig = null;
 
@@ -29,12 +29,18 @@ namespace Common.Helpers
             return database;
         }
 
-        public T GetValue<T>(string key, string value)
+        public T GetValue<T>(string key)
         {
             var database = GetConnection();
             var data = database.StringGet(key);
-            var result = JsonConvert.DeserializeObject<T>(data);
-            return result;
+
+            if (!data.IsNull)
+            {
+                var result = JsonConvert.DeserializeObject<T>(data);
+                return result;
+            }
+
+            return default(T);
         }
 
         public bool SetValue<T>(string key, T value)

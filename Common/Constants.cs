@@ -8,11 +8,26 @@ namespace Common
 {
     public class Constants
     {
+        public static double DefaultChatExpiry = 30;
+
         public enum MessageFunctionType
         {
             Start,
             Stop,
-            Update
+            Update,
+            Waiting
+        }
+
+        public enum CacheKeys
+        {
+            QueueMetaDataList,
+            AgentList
+        }
+
+        public enum QueueKey
+        {
+            ChatQueue,
+            AgentQueue
         }
     }
 }

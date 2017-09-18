@@ -20,7 +20,9 @@ namespace ChatWebApplication.API
         protected void Application_Start()
         {
             SetupDependancyInjection();
+
             GlobalConfiguration.Configure(WebApiConfig.Register);
+            //RouteConfig.RegisterRoutes(RouteTable.Routes);
         }
 
         public void SetupDependancyInjection()

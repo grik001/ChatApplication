@@ -10,9 +10,8 @@ namespace Common.Models
     {
         public DateTime ChatEntryTime { get; set; }
         public DateTime ExpiryTime { get; set; }
-        public bool IsActive { get; set; }
         public Guid? CurrentAgent { get; set; }
         public Guid ClientID { get; set; }
-        public MessageFunctionType Function {get;set;}
+        public MessageFunctionType? Function {get;set;}
     }
 }

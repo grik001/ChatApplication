@@ -54,11 +54,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constants.cs" />
+    <Compile Include="Data\IData\IAgentDataModel.cs" />
+    <Compile Include="Data\IData\IQueueDataModel.cs" />
+    <Compile Include="Data\AgentDataModel.cs" />
+    <Compile Include="Data\QueueDataModel.cs" />
     <Compile Include="Helpers\ApplicationConfig.cs" />
     <Compile Include="Helpers\IHelpers\IApplicationConfig.cs" />
+    <Compile Include="Helpers\IHelpers\ICacheHelper.cs" />
     <Compile Include="Helpers\RabbitMQHelper.cs" />
     <Compile Include="Helpers\IHelpers\IMessageQueueHelper.cs" />
     <Compile Include="Helpers\RedisHelper.cs" />
+    <Compile Include="Models\Agent.cs" />
     <Compile Include="Models\QueueMetaData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

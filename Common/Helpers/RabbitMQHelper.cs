@@ -52,14 +52,12 @@ namespace Common
                         actionOnReceive.Invoke(message);
                     };
 
-                    do
-                    {
-                        channel.BasicConsume(queue: config.QueueName,
-                                             autoAck: true,
-                                             consumer: consumer);
 
-                        await Task.Delay(10);
-                    } while (true);
+                    channel.BasicConsume(queue: config.QueueName,
+                                         autoAck: true,
+                                         consumer: consumer);
+
+                    Console.ReadKey();
                 }
             }
         }

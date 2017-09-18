@@ -1,5 +1,6 @@
-﻿@{
-    ViewBag.Title = "Chat";
+﻿
+@{
+    ViewBag.Title = "AdminSupport";
 }
 
 <h2>Chat</h2>
@@ -7,6 +8,9 @@
     <input type="text" id="message" />
     <input type="button" id="sendmessage" value="Send" />
     <input type="button" id="sendmessagetarget" value="Send" />
+
+    <input type="button" id="registeragent" value="Send" />
+
 
     <input type="hidden" id="displayname" />
     <ul id="discussion"></ul>
@@ -41,7 +45,7 @@
                 console.log(chat);
                 console.log($.connection);
 
-           
+
             });
 
             $('#sendmessage').click(function () {
@@ -49,10 +53,12 @@
                 $('#message').val('').focus();
             });
 
-            $('#sendmessagetarget').click(function () {
-                chat.server.SendMessageToSupport(targetValue, $('#displayname').val(), $('#message').val());
+            $('#registeragent').click(function () {
+                chat.server.registerAgent($('#displayname').val());
                 $('#message').val('').focus();
             });
+
+            registeragent
         });
 
         function htmlEncode(value) {
