@@ -28,6 +28,11 @@ namespace ChatWebApplication.Service.Hubs
             _agentDataModel = new AgentDataModel(_cacheHelper);
         }
 
+        public void SendAll(string message)
+        {
+            Clients.All.addNewMessageToPage("System", message);
+        }
+
         public void SendMessageToClient(string targetClient, string name, string message)
         {
             var agent = _agentDataModel.Get(new Guid(Context.ConnectionId));

@@ -47,7 +47,7 @@ namespace ChatWebApplication.Service
                 _agentDataModel = scope.Resolve<IAgentDataModel>();
 
                 var chatMonitorHelper = new ChatMonitorHelper(_queueDataModel, _agentDataModel);
-                var webserverHelper = new WebServerHelper();
+                var webserverHelper = new WebServerHelper(_applicationConfig);
                 #endregion
 
                 #region Processors

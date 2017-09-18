@@ -66,25 +66,6 @@ namespace ChatWebApplication.API.Controllers
             return BadRequest();
         }
 
-        [HttpPut]
-        public dynamic Put(Guid key)
-        {
-            try
-            {
-                if (key != Guid.Empty)
-                {
-
-                    return Ok();
-                }
-            }
-            catch (Exception ex)
-            {
-                return InternalServerError();
-            }
-
-            return BadRequest();
-        }
-
         [HttpDelete]
         public dynamic Delete(Guid id)
         {
@@ -95,7 +76,6 @@ namespace ChatWebApplication.API.Controllers
                     QueueMetaData queueMeta = new QueueMetaData();
                     queueMeta.ClientID = id;
                     queueMeta.Function = Common.Constants.MessageFunctionType.Stop;
-
                     _messageQueueHelper.PushMessage<QueueMetaData>(_applicationConfig, queueMeta);
 
                     return Ok();

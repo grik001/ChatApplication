@@ -1,7 +1,9 @@
-﻿using Common;
+﻿using ChatWebApplication.Service.Hubs;
+using Common;
 using Common.Data.IData;
 using Common.Helpers.IHelpers;
 using Common.Models;
+using Microsoft.AspNet.SignalR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -84,6 +86,9 @@ namespace ChatWebApplication.Helpers.Service
 
             if (queueMetaData.Function == Constants.MessageFunctionType.Stop)
             {
+                IHubContext hubContext = GlobalHost.ConnectionManager.GetHubContext<ChatHub>();
+                
+                new ChatHub().SendAll("WOW");
                 _queueDataModel.Delete(queueMetaData.ClientID);
             }
 
