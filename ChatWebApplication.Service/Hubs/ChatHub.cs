@@ -1,4 +1,6 @@
-﻿using Common.Data;
+﻿using ChatWebApplication.Service.Helpers;
+using ChatWebApplication.Service.Hubs.IHub;
+using Common.Data;
 using Common.Data.IData;
 using Common.Helpers;
 using Common.Helpers.IHelpers;
@@ -12,16 +14,18 @@ using System.Threading.Tasks;
 
 namespace ChatWebApplication.Service.Hubs
 {
-    public class ChatHub : Hub
+    public class ChatHub : Hub, IChatHub
     {
-        static IApplicationConfig _applicationConfig = null;
-        static IMessageQueueHelper _messageQueueHelper = null;
-        static ICacheHelper _cacheHelper = null;
-        static IQueueDataModel _queueDataModel = null;
-        static IAgentDataModel _agentDataModel = null;
+        IHubContext hubContext = GlobalHost.ConnectionManager.GetHubContext<ChatHub>();
+
+        IQueueDataModel _queueDataModel = null;
+        IAgentDataModel _agentDataModel = null;
+        ICacheHelper _cacheHelper = null;
+        IApplicationConfig _applicationConfig = null;
 
         public ChatHub()
         {
+            //To Fix - DI needs to be done on startup or per request if possible
             _applicationConfig = new ApplicationConfig();
             _cacheHelper = new RedisHelper(_applicationConfig);
             _queueDataModel = new QueueDataModel(_cacheHelper);
@@ -30,7 +34,7 @@ namespace ChatWebApplication.Service.Hubs
 
         public void SendAll(string message)
         {
-            Clients.All.addNewMessageToPage("System", message);
+            hubContext.Clients.All.addNewMessageToPage("System", message);
         }
 
         public void SendMessageToClient(string targetClient, string name, string message)
@@ -43,8 +47,8 @@ namespace ChatWebApplication.Service.Hubs
 
                 if (isClientAssignedToAgent)
                 {
-                    Clients.Client(targetClient).addNewMessageToPage(name, message);
-                    Clients.Client(Context.ConnectionId).addNewMessageToPage(name, message);
+                    hubContext.Clients.Client(targetClient).addNewMessageToPage(name, message);
+                    hubContext.Clients.Client(Context.ConnectionId).addNewMessageToPage(name, message, targetClient);
                 }
             }
         }
@@ -55,26 +59,38 @@ namespace ChatWebApplication.Service.Hubs
 
             if (chatQueue.CurrentAgent.HasValue)
             {
-                Clients.Client(chatQueue.CurrentAgent.ToString()).addNewMessageToPage(name, message);
-                Clients.Client(Context.ConnectionId).addNewMessageToPage(name, message);
+                hubContext.Clients.Client(chatQueue.CurrentAgent.ToString()).addNewMessageToPage(name, message, Context.ConnectionId);
+                hubContext.Clients.Client(Context.ConnectionId).addNewMessageToPage(name, message);
             }
             else
             {
-                Clients.Client(Context.ConnectionId).addNewMessageToPage("System", "Please wait no Agents available");
+                hubContext.Clients.Client(Context.ConnectionId).addNewMessageToPage("System", "Please wait no Agents available");
             }
         }
 
-        public void RegisterAgent(string name)
+        public void StartAgent(string name)
         {
-            Agent agent = new Agent();
-            agent.ID = new Guid(Context.ConnectionId);
-            agent.Name = name;
-            agent.Surname = "";
-            agent.ServiceCount = 0;
-
-            _agentDataModel.Insert(agent);
+            AgentHelper agentHelper = new AgentHelper(_agentDataModel);
+            agentHelper.RegisterAgent(name, new Guid(Context.ConnectionId));
         }
 
+        public void StartChat(string customerID, string adminID)
+        {
+            hubContext.Clients.Client(adminID).startChat(customerID);
+
+            var agent = _agentDataModel.Get(new Guid(adminID));
+
+            hubContext.Clients.Client(adminID).addNewMessageToPage("Server", "ChatStarted with client" , customerID);
+            hubContext.Clients.Client(customerID).addNewMessageToPage("Server", $"ChatStarted with {agent.Username}");
+        }
+
+        public void PauseAgent()
+        {
+            AgentHelper agentHelper = new AgentHelper(_agentDataModel);
+            agentHelper.PauseAgent(new Guid(Context.ConnectionId));
+        }
+
+        #region Overrides
         public override Task OnConnected()
         {
             Console.WriteLine("Hub OnConnected {0}\n", Context.ConnectionId);
@@ -92,5 +108,6 @@ namespace ChatWebApplication.Service.Hubs
             Console.WriteLine("Hub OnReconnected {0}\n", Context.ConnectionId);
             return (base.OnDisconnected(false));
         }
+        #endregion
     }
 }

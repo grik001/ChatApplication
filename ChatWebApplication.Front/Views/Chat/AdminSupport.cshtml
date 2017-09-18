@@ -4,20 +4,28 @@
 }
 
 <h2>Chat</h2>
-<div class="container">
-    <input type="text" id="message" />
-    <input type="button" id="sendmessage" value="Send" />
-    <input type="button" id="sendmessagetarget" value="Send" />
+<input type="hidden" id="displayname" />
 
-    <input type="button" id="registeragent" value="Send" />
-
-
-    <input type="hidden" id="displayname" />
-    <ul id="discussion"></ul>
+<div>
+    <input type="button" id="registerAgent" value="Start" />
+    <input type="button" id="pauseAgent" value="Pause" />
 </div>
 
-@section scripts {
+<br />
 
+<div id="chats">
+</div>
+
+
+<div id="toClone" class="container" style="visibility: hidden;">
+    <label class="clientID"></label>
+    <input type="text" class="message" />
+    <input type="button" class="sendmessagetarget" value="Send" />
+    <ul class="discussion"></ul>
+</div>
+
+
+@section scripts {
     <script src="~/Scripts/jquery.signalR-2.2.2.min.js"></script>
     <script src="http://localhost:8090/signalr/hubs"></script>
 
@@ -25,40 +33,46 @@
         var targetValue = '';
 
         $(function () {
-
             $.connection.hub.url = "http://localhost:8090/signalr";
-
             var chat = $.connection.chatHub;
 
-
-            chat.client.addNewMessageToPage = function (name, message) {
-                // Add the message to the page.
-                $('#discussion').append('<li><strong>' + htmlEncode(name)
+            chat.client.addNewMessageToPage = function (name, message, id) {
+                $('#' + id).find('.discussion').append('<li><strong>' + htmlEncode(name)
                     + '</strong>: ' + htmlEncode(message) + '</li>');
+            };
+
+            chat.client.startChat = function (id) {
+                var cloned = $("#toClone").clone();
+                cloned.css("visibility", "visible");
+                cloned.prop('id', id);
+                cloned.find('.clientID').text(id);
+
+                cloned.find('.sendmessagetarget').click(function () {
+                    var clientID = $(this).parent().prop('id');
+                    chat.server.sendMessageToClient(clientID, $('#displayname').val(), cloned.find('.message').val());
+                    $('#message').val('').focus();
+                });
+
+                cloned.appendTo("#chats");
             };
 
             $('#displayname').val(prompt('Enter your name:', ''));
             $('#message').focus();
 
             $.connection.hub.start().done(function () {
+                chat.server.startAgent($('#displayname').val());
 
-                console.log(chat);
-                console.log($.connection);
+                $('#registerAgent').click(function () {
+                    console.log('staragent');
+                    chat.server.startAgent($('#displayname').val());
+                    $('#message').val('').focus();
+                });
 
-
+                $('#pauseAgent').click(function () {
+                    chat.server.pauseAgent();
+                    $('#message').val('').focus();
+                });
             });
-
-            $('#sendmessage').click(function () {
-                chat.server.send($('#displayname').val(), $('#message').val());
-                $('#message').val('').focus();
-            });
-
-            $('#registeragent').click(function () {
-                chat.server.registerAgent($('#displayname').val());
-                $('#message').val('').focus();
-            });
-
-            registeragent
         });
 
         function htmlEncode(value) {

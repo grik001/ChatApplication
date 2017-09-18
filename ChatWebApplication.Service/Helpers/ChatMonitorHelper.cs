@@ -1,4 +1,5 @@
 ﻿using ChatWebApplication.Service.Hubs;
+using ChatWebApplication.Service.Hubs.IHub;
 using Common;
 using Common.Data.IData;
 using Common.Helpers.IHelpers;
@@ -16,11 +17,13 @@ namespace ChatWebApplication.Helpers.Service
     {
         IQueueDataModel _queueDataModel = null;
         IAgentDataModel _agentDataModel = null;
+        IChatHub _chatHub = null;
 
-        public ChatMonitorHelper(IQueueDataModel queueDataModel, IAgentDataModel agentDataModel)
+        public ChatMonitorHelper(IQueueDataModel queueDataModel, IAgentDataModel agentDataModel, IChatHub chatHub)
         {
             _queueDataModel = queueDataModel;
             _agentDataModel = agentDataModel;
+            _chatHub = chatHub;
         }
 
         public async void MonitorQueue()
@@ -43,7 +46,7 @@ namespace ChatWebApplication.Helpers.Service
 
                             foreach (var unservicedChat in unservicedChats)
                             {
-                                var availableAgents = agents.Values.Where(x => x.ActiveChats.Count() < x.MaxChats);
+                                var availableAgents = agents.Values.Where(x => x.ActiveChats.Count() < x.MaxChats && x.IsPaused == false);
                                 if (availableAgents.Any())
                                 {
                                     var leastActiveAgent = availableAgents.OrderBy(x => x.ServiceCount).FirstOrDefault();
@@ -55,6 +58,8 @@ namespace ChatWebApplication.Helpers.Service
 
                                     _agentDataModel.Update(leastActiveAgent);
                                     _queueDataModel.Update(unservicedChat);
+
+                                    _chatHub.StartChat(unservicedChat.ClientID.ToString(), leastActiveAgent.ID.ToString());
                                 }
                             }
                         }
@@ -86,9 +91,7 @@ namespace ChatWebApplication.Helpers.Service
 
             if (queueMetaData.Function == Constants.MessageFunctionType.Stop)
             {
-                IHubContext hubContext = GlobalHost.ConnectionManager.GetHubContext<ChatHub>();
-                
-                new ChatHub().SendAll("WOW");
+                _chatHub.SendAll("WOW");
                 _queueDataModel.Delete(queueMetaData.ClientID);
             }
 

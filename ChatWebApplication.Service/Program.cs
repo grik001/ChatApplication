@@ -1,6 +1,8 @@
 ﻿using Autofac;
 using ChatWebApplication.Helpers.Service;
 using ChatWebApplication.Service.Helpers;
+using ChatWebApplication.Service.Hubs;
+using ChatWebApplication.Service.Hubs.IHub;
 using Common;
 using Common.Data;
 using Common.Data.IData;
@@ -22,6 +24,7 @@ namespace ChatWebApplication.Service
         static ICacheHelper _cacheHelper = null;
         static IQueueDataModel _queueDataModel = null;
         static IAgentDataModel _agentDataModel = null;
+        static IChatHub _chatHub = null;
 
         static void Main(string[] args)
         {
@@ -33,6 +36,7 @@ namespace ChatWebApplication.Service
             builder.RegisterType<RabbitMQHelper>().As<IMessageQueueHelper>();
             builder.RegisterType<QueueDataModel>().As<IQueueDataModel>();
             builder.RegisterType<AgentDataModel>().As<IAgentDataModel>();
+            builder.RegisterType<ChatHub>().As<IChatHub>();
 
             var container = builder.Build();
             #endregion
@@ -45,8 +49,9 @@ namespace ChatWebApplication.Service
                 _applicationConfig = scope.Resolve<IApplicationConfig>();
                 _queueDataModel = scope.Resolve<IQueueDataModel>();
                 _agentDataModel = scope.Resolve<IAgentDataModel>();
-
-                var chatMonitorHelper = new ChatMonitorHelper(_queueDataModel, _agentDataModel);
+                _chatHub = scope.Resolve<IChatHub>();
+                
+                var chatMonitorHelper = new ChatMonitorHelper(_queueDataModel, _agentDataModel, _chatHub);
                 var webserverHelper = new WebServerHelper(_applicationConfig);
                 #endregion
 

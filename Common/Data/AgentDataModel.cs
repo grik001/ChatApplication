@@ -23,6 +23,9 @@ namespace Common.Data
         {
             var list = _cacheHelper.GetValue<Dictionary<Guid,Agent>>(Constants.CacheKeys.AgentList.ToString());
 
+            if (list == null)
+                return null;
+
             Agent agent = null;
             list.TryGetValue(id, out agent);
 
