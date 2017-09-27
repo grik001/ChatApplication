@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNet.SignalR;
+﻿using ChatWebApplication.Service.Hubs;
+using Common.Data;
+using Common.Helpers;
+using Microsoft.AspNet.SignalR;
 using Microsoft.Owin.Cors;
 using Owin;
 using System;
@@ -13,6 +16,19 @@ namespace ChatWebApplication.Service
     {
         public void Configuration(IAppBuilder app)
         {
+            var _applicationConfig = new ApplicationConfig();
+            var _cacheHelper = new RedisHelper(_applicationConfig);
+            var _queueDataModel = new QueueDataModel(_cacheHelper);
+            var _agentDataModel = new AgentDataModel(_cacheHelper);
+            var chatHub = new ChatHub(_applicationConfig, _cacheHelper, _queueDataModel, _agentDataModel);
+
+            GlobalHost.DependencyResolver.Register(
+                typeof(ChatHub),() => chatHub);
+
+
+            GlobalHost.DependencyResolver.Register(
+                typeof(AgentHub), () => new AgentHub(_agentDataModel, _queueDataModel, chatHub));
+
             // Branch the pipeline here for requests that start with "/signalr"
             app.Map("/signalr", map =>
             {

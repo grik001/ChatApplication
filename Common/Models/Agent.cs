@@ -13,6 +13,7 @@ namespace Common.Models
         public int MaxChats { get; set; }
         public int ServiceCount { get; set; }
         public bool IsPaused { get; set; }
+        public Guid SocketID { get; set; }
 
         public HashSet<Guid> ActiveChats { get; set; }
 

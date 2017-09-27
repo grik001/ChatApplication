@@ -23,25 +23,6 @@ namespace ChatWebApplication.API.Controllers
             this._applicationConfig = applicationConfig;
         }
 
-        [HttpGet]
-        public dynamic Get(Guid? key)
-        {
-            try
-            {
-                if (key != Guid.Empty)
-                {
-
-                    return Ok();
-                }
-            }
-            catch (Exception ex)
-            {
-                return InternalServerError();
-            }
-
-            return BadRequest();
-        }
-
         [HttpPost]
         public dynamic Post([FromBody]ChatQueuePostRequest request)
         {

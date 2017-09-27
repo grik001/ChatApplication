@@ -12,6 +12,8 @@ namespace Common.Models
         public DateTime ExpiryTime { get; set; }
         public Guid? CurrentAgent { get; set; }
         public Guid ClientID { get; set; }
-        public MessageFunctionType? Function {get;set;}
+        public MessageFunctionType? Function { get; set; }
+        public List<Tuple<DateTime, Guid, string>> Messages { get; set; }
+        public bool IsClosed { get; set; }
     }
 }

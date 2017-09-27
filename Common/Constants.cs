@@ -8,7 +8,7 @@ namespace Common
 {
     public class Constants
     {
-        public static double DefaultChatExpiry = 30;
+        public static double DefaultChatExpiry = 5;
 
         public enum MessageFunctionType
         {

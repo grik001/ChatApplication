@@ -28,14 +28,15 @@
 @section scripts {
     <script src="~/Scripts/jquery.signalR-2.2.2.min.js"></script>
     <script src="http://localhost:8090/signalr/hubs"></script>
-
     <script>
         var targetValue = '';
 
         $(function () {
             $.connection.hub.url = "http://localhost:8090/signalr";
-            var chat = $.connection.chatHub;
+            var agent = $.connection.agentHub;
 
+            var chat = $.connection.chatHub;
+            
             chat.client.addNewMessageToPage = function (name, message, id) {
                 $('#' + id).find('.discussion').append('<li><strong>' + htmlEncode(name)
                     + '</strong>: ' + htmlEncode(message) + '</li>');
@@ -60,16 +61,16 @@
             $('#message').focus();
 
             $.connection.hub.start().done(function () {
-                chat.server.startAgent($('#displayname').val());
+                agent.server.startAgent($('#displayname').val(), true);
 
                 $('#registerAgent').click(function () {
                     console.log('staragent');
-                    chat.server.startAgent($('#displayname').val());
+                    agent.server.startAgent($('#displayname').val(), false);
                     $('#message').val('').focus();
                 });
 
                 $('#pauseAgent').click(function () {
-                    chat.server.pauseAgent();
+                    agent.server.pauseAgent();
                     $('#message').val('').focus();
                 });
             });

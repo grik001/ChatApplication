@@ -26,6 +26,26 @@ namespace ChatWebApplication.Helpers.Service
             _chatHub = chatHub;
         }
 
+        public async void ExpiredChatMonitor()
+        {
+            do
+            {
+                var chatQueues = _queueDataModel.Get();
+
+                if (chatQueues != null && chatQueues.Any())
+                {
+                    var expiredChats = chatQueues.Where(x => x.Value.ExpiryTime < DateTime.UtcNow || x.Value.IsClosed);
+
+                    foreach (var expiredChat in expiredChats)
+                    {
+                        _queueDataModel.Delete(expiredChat.Key);
+                    }
+                }
+
+                await Task.Delay(2000);
+            } while (true);
+        }
+
         public async void MonitorQueue()
         {
             do
@@ -66,7 +86,7 @@ namespace ChatWebApplication.Helpers.Service
                     }
                 }
 
-                await Task.Delay(5000);
+                await Task.Delay(2000);
             } while (true);
         }
 
@@ -91,7 +111,6 @@ namespace ChatWebApplication.Helpers.Service
 
             if (queueMetaData.Function == Constants.MessageFunctionType.Stop)
             {
-                _chatHub.SendAll("WOW");
                 _queueDataModel.Delete(queueMetaData.ClientID);
             }
 

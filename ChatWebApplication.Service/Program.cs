@@ -12,6 +12,7 @@ using Common.Models;
 using Microsoft.Owin.Hosting;
 using System;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -38,6 +39,7 @@ namespace ChatWebApplication.Service
             builder.RegisterType<AgentDataModel>().As<IAgentDataModel>();
             builder.RegisterType<ChatHub>().As<IChatHub>();
 
+            builder.RegisterType<QueueDataModel>().As<IQueueDataModel>().SingleInstance();
             var container = builder.Build();
             #endregion
 

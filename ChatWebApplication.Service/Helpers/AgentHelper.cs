@@ -1,4 +1,5 @@
-﻿using Common.Data.IData;
+﻿using ChatWebApplication.Service.Hubs.IHub;
+using Common.Data.IData;
 using Common.Models;
 using System;
 using System.Collections.Generic;
@@ -11,13 +12,17 @@ namespace ChatWebApplication.Service.Helpers
     public class AgentHelper
     {
         IAgentDataModel _agentDataModel = null;
+        IQueueDataModel _queueDataModel = null;
+        IChatHub _chatHub = null;
 
-        public AgentHelper(IAgentDataModel agentDataModel)
+        public AgentHelper(IAgentDataModel agentDataModel, IQueueDataModel queueDataModel, IChatHub chatHub)
         {
             this._agentDataModel = agentDataModel;
+            this._queueDataModel = queueDataModel;
+            this._chatHub = chatHub;
         }
 
-        public void RegisterAgent(string name, Guid id)
+        public Agent RegisterAgent(string name, Guid socketID, Guid id)
         {
             var agent = _agentDataModel.Get(id);
 
@@ -25,6 +30,7 @@ namespace ChatWebApplication.Service.Helpers
             {
                 agent = new Agent();
                 agent.ID = new Guid(id.ToString());
+                agent.SocketID = socketID;
                 agent.Username = name;
                 agent.ServiceCount = 0;
 
@@ -33,10 +39,29 @@ namespace ChatWebApplication.Service.Helpers
             else
             {
                 agent.IsPaused = false;
+                agent.SocketID = socketID;
                 _agentDataModel.Update(agent);
             }
+
+            return agent;
         }
 
+        public void DisableAgent(Guid id)
+        {
+            var agent = _agentDataModel.Get(id);
+
+            foreach (var chatQueueID in agent.ActiveChats)
+            {
+                var chat = _queueDataModel.Get(chatQueueID);
+
+                if (chat != null)
+                {
+                    chat.CurrentAgent = null;
+                    _chatHub.NotifyAgentDisconnect(chat.ClientID.ToString());
+                }
+            }
+        }
+        
         public void PauseAgent(Guid id)
         {
             var agent = _agentDataModel.Get(id);

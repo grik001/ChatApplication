@@ -87,7 +87,9 @@
     <Compile Include="Helpers\AgentHelper.cs" />
     <Compile Include="Helpers\ChatMonitorHelper.cs" />
     <Compile Include="Helpers\WebServerHelper.cs" />
+    <Compile Include="Hubs\AgentHub.cs" />
     <Compile Include="Hubs\ChatHub.cs" />
+    <Compile Include="Hubs\IHub\IAgentHub.cs" />
     <Compile Include="Hubs\IHub\IChatHub.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

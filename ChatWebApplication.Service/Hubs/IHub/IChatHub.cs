@@ -12,6 +12,7 @@ namespace ChatWebApplication.Service.Hubs.IHub
         void SendMessageToClient(string targetClient, string name, string message);
         void SendMessageToSupport(string name, string message);
         void StartChat(string customerID, string adminID);
+        void NotifyAgentDisconnect(string customerID);
         Task OnConnected();
         Task OnDisconnected(bool val);
         Task OnReconnected();
