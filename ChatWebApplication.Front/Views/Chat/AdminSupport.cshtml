@@ -16,7 +16,6 @@
 <div id="chats">
 </div>
 
-
 <div id="toClone" class="container" style="visibility: hidden;">
     <label class="clientID"></label>
     <input type="text" class="message" />
@@ -34,8 +33,8 @@
         $(function () {
             $.connection.hub.url = "http://localhost:8090/signalr";
             var agent = $.connection.agentHub;
-
             var chat = $.connection.chatHub;
+
             
             chat.client.addNewMessageToPage = function (name, message, id) {
                 $('#' + id).find('.discussion').append('<li><strong>' + htmlEncode(name)
