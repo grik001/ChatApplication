@@ -17,7 +17,6 @@ namespace ChatWebApplication.Service.Hubs
     public class AgentHub : Hub, IAgentHub
     {
         IHubContext hubContext = GlobalHost.ConnectionManager.GetHubContext<AgentHub>();
-
         IAgentDataModel _agentDataModel = null;
         IQueueDataModel _queueDataModel = null;
         IChatHub _chatHub = null;
@@ -32,16 +31,20 @@ namespace ChatWebApplication.Service.Hubs
         public void StartAgent(string name, bool isRefresh = false)
         {
             var cookies = this.Context.RequestCookies;
-            var adminID = this.Context.RequestCookies["AdminID"].Value;
 
-            AgentHelper agentHelper = new AgentHelper(_agentDataModel, _queueDataModel, _chatHub);
-            var agent = agentHelper.RegisterAgent(name, new Guid(Context.ConnectionId), new Guid(adminID));
-
-            if(agent != null && isRefresh)
+            if (cookies.ContainsKey("AdminID"))
             {
-                foreach (var activeChat in agent.ActiveChats)
+                var adminID = this.Context.RequestCookies["AdminID"].Value;
+
+                AgentHelper agentHelper = new AgentHelper(_agentDataModel, _queueDataModel, _chatHub);
+                var agent = agentHelper.RegisterAgent(name, new Guid(Context.ConnectionId), new Guid(adminID));
+
+                if (agent != null && isRefresh)
                 {
-                    _chatHub.StartChat(activeChat.ToString(), agent.ID.ToString());
+                    foreach (var activeChat in agent.ActiveChats)
+                    {
+                        _chatHub.StartChat(activeChat.ToString(), agent.ID.ToString());
+                    }
                 }
             }
         }

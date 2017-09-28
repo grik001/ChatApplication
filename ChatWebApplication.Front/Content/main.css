@@ -1,0 +1,22 @@
+﻿body {
+}
+
+.chatListItem {
+    padding: 10px;
+    border-bottom: 1px black solid;
+}
+
+.chatButton {
+}
+
+.chatWindow {
+    border: 1px black solid
+}
+
+.chatListItemImage {
+    width: 20px;
+}
+
+.chatButtonContainer {
+    text-align:right;
+}

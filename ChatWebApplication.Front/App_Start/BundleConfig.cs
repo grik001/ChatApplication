@@ -16,7 +16,7 @@ namespace ChatWebApplication.Front.App_Start
 
         public static void StyleBundle(BundleCollection bundles)
         {
-            bundles.Add(new StyleBundle("~/css").Include("~/Content/bootstrap.css"));
+            bundles.Add(new StyleBundle("~/css").Include("~/Content/bootstrap.css").Include("~/Content/main.css"));
         }
 
         public static void ScriptBundle(BundleCollection bundles)
