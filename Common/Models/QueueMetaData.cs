@@ -15,5 +15,6 @@ namespace Common.Models
         public MessageFunctionType? Function { get; set; }
         public List<Tuple<DateTime, Guid, string>> Messages { get; set; }
         public bool IsClosed { get; set; }
+        public string Username { get; set; }
     }
 }

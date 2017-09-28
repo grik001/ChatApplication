@@ -86,7 +86,7 @@ namespace ChatWebApplication.Helpers.Service
                     }
                 }
 
-                await Task.Delay(2000);
+                await Task.Delay(10000);
             } while (true);
         }
 

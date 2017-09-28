@@ -86,8 +86,11 @@ namespace ChatWebApplication.Service.Hubs
         public void StartChat(string customerID, string adminID)
         {
             var agent = _agentDataModel.Get(new Guid(adminID));
+            var chat = _queueDataModel.Get(new Guid(customerID));
 
-            hubContext.Clients.Client(agent.SocketID.ToString()).startChat(customerID);
+
+
+            hubContext.Clients.Client(agent.SocketID.ToString()).startChat(customerID, chat.Username);
 
             hubContext.Clients.Client(agent.SocketID.ToString()).addNewMessageToPage("Server", "ChatStarted with client" , customerID);
             hubContext.Clients.Client(customerID).addNewMessageToPage("Server", $"ChatStarted with {agent.Username}");

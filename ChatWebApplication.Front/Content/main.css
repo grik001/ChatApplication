@@ -1,22 +1,71 @@
 ﻿body {
 }
 
-.chatListItem {
-    padding: 10px;
-    border-bottom: 1px black solid;
+.chatListContainer{
+    padding: 4px;
 }
 
-.chatButton {
+.chatWindowContainer {
+    padding-right: 15px;
+    padding-left: 1px;
+}
+
+.chatListItem {
+    padding: 10px;
+}
+
+.chatListItemData {
+    padding: 10px;
 }
 
 .chatWindow {
-    border: 1px black solid
+    min-height: 500px;
 }
 
 .chatListItemImage {
-    width: 20px;
+    width: 40px;
+    border-radius: 50%;
 }
 
 .chatButtonContainer {
-    text-align:right;
+    text-align: right;
+}
+
+.center-block {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.chatWindowButtonSection {
+    /*margin-top: 20px;
+    margin-bottom: 20px;*/
+}
+
+.chatHub {
+    box-shadow: 0 1px 1px 0 rgba(0, 0, 0, .06), 0 2px 5px 0 rgba(0, 0, 0, .2);
+    padding-top: 10px;
+}
+
+.panel-body {
+    padding: 0px;
+}
+
+.input-group {
+    position: relative;
+    display: table;
+    border-collapse: separate;
+}
+
+.sidebar-body {
+    position: relative;
+    padding: 10px !important;
+    border-bottom: 1px solid #f7f7f7;
+    height: 72px;
+    margin: 0 !important;
+    cursor: pointer;
+}
+
+.sidebar-body:hover {
+    background-color: #f2f2f2;
 }
