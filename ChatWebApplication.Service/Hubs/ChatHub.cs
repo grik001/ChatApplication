@@ -38,13 +38,13 @@ namespace ChatWebApplication.Service.Hubs
             hubContext.Clients.All.addNewMessageToPage("System", message);
         }
 
-        public void SendMessageToClient(string targetClient, string name, string message)
+        public void SendMessageToClient(string targetClient, string message)
         {
             var cookies = this.Context.RequestCookies;
             var adminID = this.Context.RequestCookies["AdminID"].Value;
 
             var agent = _agentDataModel.Get(new Guid(adminID));
-
+            
             if (agent != null)
             {
                 var isClientAssignedToAgent = agent.ActiveChats.Contains(new Guid(targetClient));
@@ -52,8 +52,8 @@ namespace ChatWebApplication.Service.Hubs
                 if (isClientAssignedToAgent)
                 {
                     IncreaseChatExpiry(targetClient);
-                    hubContext.Clients.Client(targetClient).addNewMessageToPage(name, message);
-                    hubContext.Clients.Client(Context.ConnectionId).addNewMessageToPage(name, message, targetClient);
+                    hubContext.Clients.Client(targetClient).addNewMessageToPage(agent.Username, message);
+                    hubContext.Clients.Client(Context.ConnectionId).addNewMessageToPage(targetClient, agent.Username, message, true);
                 }
             }
         }
@@ -67,7 +67,7 @@ namespace ChatWebApplication.Service.Hubs
                 var agent = _agentDataModel.Get(chatQueue.CurrentAgent.Value);
 
                 IncreaseChatExpiry(Context.ConnectionId);
-                hubContext.Clients.Client(agent.SocketID.ToString()).addNewMessageToPage(name, message, Context.ConnectionId);
+                hubContext.Clients.Client(agent.SocketID.ToString()).addNewMessageToPage(Context.ConnectionId, message, name);
                 hubContext.Clients.Client(Context.ConnectionId).addNewMessageToPage(name, message);
             }
             else
@@ -88,17 +88,15 @@ namespace ChatWebApplication.Service.Hubs
             var agent = _agentDataModel.Get(new Guid(adminID));
             var chat = _queueDataModel.Get(new Guid(customerID));
 
-
-
             hubContext.Clients.Client(agent.SocketID.ToString()).startChat(customerID, chat.Username);
 
-            hubContext.Clients.Client(agent.SocketID.ToString()).addNewMessageToPage("Server", "ChatStarted with client" , customerID);
-            hubContext.Clients.Client(customerID).addNewMessageToPage("Server", $"ChatStarted with {agent.Username}");
+            hubContext.Clients.Client(agent.SocketID.ToString()).addNewMessageToPage(customerID, "ChatStarted with client" , "Server", false);
+            hubContext.Clients.Client(customerID).addNewMessageToPage("Server", $"ChatStarted with {agent.Username}", false);
         }
 
         public void NotifyAgentDisconnect(string customerID)
         {
-            hubContext.Clients.Client(customerID).addNewMessageToPage("System", "Agent disconnected. Please wait to be reconnected");
+            hubContext.Clients.Client(customerID).addNewMessageToPage("System", "Agent disconnected. Please wait to be reconnected", false);
         }
 
         #region Overrides

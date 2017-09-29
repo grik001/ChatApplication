@@ -9,7 +9,7 @@ namespace ChatWebApplication.Service.Hubs.IHub
     public interface IChatHub
     {
         void SendAll(string message);
-        void SendMessageToClient(string targetClient, string name, string message);
+        void SendMessageToClient(string targetClient, string message);
         void SendMessageToSupport(string name, string message);
         void StartChat(string customerID, string adminID);
         void NotifyAgentDisconnect(string customerID);
