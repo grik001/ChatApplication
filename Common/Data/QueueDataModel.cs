@@ -21,7 +21,10 @@ namespace Common.Data
 
         public QueueMetaData Get(Guid id)
         {
-            var list = _cacheHelper.GetValue<Dictionary<Guid,QueueMetaData>>(Constants.CacheKeys.QueueMetaDataList.ToString());
+            var list = _cacheHelper.GetValue<Dictionary<Guid, QueueMetaData>>(Constants.CacheKeys.QueueMetaDataList.ToString());
+     
+            if (list == null)
+                return null;
 
             QueueMetaData queue = null;
             list.TryGetValue(id, out queue);

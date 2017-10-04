@@ -60,6 +60,10 @@ var ChatListItem = React.createClass({
     componentWillMount: function () {
     },
 
+    closeChat: function () {
+        console.log('close');
+    },
+
     render: function () {
         return (
             <div onClick={this.props.activateChat} className="row sidebar-body">
@@ -73,9 +77,13 @@ var ChatListItem = React.createClass({
                         <div className="col-sm-8 col-xs-8 sideBar-name">
                             <span className="name-meta">{this.props.chat.username}</span>
                         </div>
-                        <div className="col-sm-4 col-xs-4 pull-right sideBar-time">
+                        <div onClick={this.closeChat} className="col-sm-2 col-xs-2 pull-right sideBar-close">
+                            <img className="chatListItemImage" src="https://cdn4.iconfinder.com/data/icons/geomicons/32/672366-x-128.png" />
+                        </div>
+                        <div className="col-sm-2 col-xs-2 pull-right sideBar-time">
                             <span className="time-meta pull-right">18:18</span>
                         </div>
+
                     </div>
                 </div>
             </div>
@@ -100,6 +108,10 @@ var ChatWindow = React.createClass({
         this.props.chatHub.server.sendMessageToClient(id, text);
     },
 
+    clearMessage: function () {
+        this.setState({ chatText: '' });
+    },
+
     chatTextChange: function (event) {
         var chatText = event.target.value;
         this.setState({ chatText: chatText });
@@ -121,7 +133,7 @@ var ChatWindow = React.createClass({
                             <input type="text" className="form-control" value={this.state.chatText} onChange={this.chatTextChange} />
                             <span className="input-group-btn">
                                 <button className="btn btn-default" onClick={this.sendMessage} type="button">Send</button>
-                                <button className="btn btn-default" type="button">Clear</button>
+                                <button className="btn btn-default" onClick={this.clearMessage} type="button">Clear</button>
                             </span>
                         </div>
                     </div>
@@ -136,9 +148,9 @@ var MessageList = React.createClass({
     render: function () {
         return (
             <div className="col-md-12">
-                <ul class="chat">
+                <ul className="chatMessageList">
                     {
-                        this.props.messages.map(message => <Message key={message.id} text={message.text} username={message.username} />)
+                        this.props.messages.map(message => <Message key={message.id} text={message.text} username={message.username} isMe={message.isMe} />)
                     }
                 </ul>
             </div>
@@ -148,11 +160,17 @@ var MessageList = React.createClass({
 
 var Message = React.createClass({
     render: function () {
-        return (
-                <li className="left clearfix">
+        let liMessage = null;
+
+        if (!this.props.isMe) {
+
+            liMessage =
+
+                < li className="left clearfix" >
                     <span className="chat-img pull-left">
                         <img src="http://placehold.it/50/55C1E7/fff&amp;text=U" alt="User Avatar" className="img-circle" />
                     </span>
+
                     <div className="chat-body clearfix">
                         <div className="header">
                             <strong className="primary-font">{this.props.username}</strong>
@@ -164,7 +182,31 @@ var Message = React.createClass({
                             {this.props.text}
                         </p>
                     </div>
-                </li>
+                </li>;
+
+        } else {
+
+            liMessage =
+
+                <li className="right clearfix">
+                    <span className="chat-img pull-right">
+                        <img src="http://placehold.it/50/FA6F57/fff&amp;text=ME" alt="User Avatar" className="img-circle" />
+                    </span>
+                    <div className="chat-body clearfix">
+                        <div className="header">
+                            <small className=" text-muted"><span className="glyphicon glyphicon-time"></span>13 mins ago</small>
+                            <strong className="pull-right primary-font">{this.props.username}</strong>
+                        </div>
+                        <p>
+                            {this.props.text}
+                        </p>
+                    </div>
+                </li>;
+        }
+
+
+        return (
+            liMessage
         );
     }
 });

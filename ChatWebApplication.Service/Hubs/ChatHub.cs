@@ -62,13 +62,13 @@ namespace ChatWebApplication.Service.Hubs
         {
             var chatQueue = _queueDataModel.Get(new Guid(Context.ConnectionId));
 
-            if (chatQueue.CurrentAgent.HasValue)
+            if (chatQueue != null && chatQueue.CurrentAgent.HasValue)
             {
                 var agent = _agentDataModel.Get(chatQueue.CurrentAgent.Value);
 
                 IncreaseChatExpiry(Context.ConnectionId);
-                hubContext.Clients.Client(agent.SocketID.ToString()).addNewMessageToPage(Context.ConnectionId, message, name);
-                hubContext.Clients.Client(Context.ConnectionId).addNewMessageToPage(name, message);
+                hubContext.Clients.Client(agent.SocketID.ToString()).addNewMessageToPage(Context.ConnectionId, name, message, false);
+                hubContext.Clients.Client(Context.ConnectionId).addNewMessageToPage(name, message, true);
             }
             else
             {
@@ -87,11 +87,13 @@ namespace ChatWebApplication.Service.Hubs
         {
             var agent = _agentDataModel.Get(new Guid(adminID));
             var chat = _queueDataModel.Get(new Guid(customerID));
+            if (chat != null)
+            {
+                hubContext.Clients.Client(agent.SocketID.ToString()).startChat(customerID, chat.Username);
 
-            hubContext.Clients.Client(agent.SocketID.ToString()).startChat(customerID, chat.Username);
-
-            hubContext.Clients.Client(agent.SocketID.ToString()).addNewMessageToPage(customerID, "ChatStarted with client" , "Server", false);
-            hubContext.Clients.Client(customerID).addNewMessageToPage("Server", $"ChatStarted with {agent.Username}", false);
+                hubContext.Clients.Client(agent.SocketID.ToString()).addNewMessageToPage(customerID, "Server", "ChatStarted with client", false);
+                hubContext.Clients.Client(customerID).addNewMessageToPage("Server", $"ChatStarted with {agent.Username}", false);
+            }
         }
 
         public void NotifyAgentDisconnect(string customerID)

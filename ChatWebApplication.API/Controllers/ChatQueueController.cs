@@ -33,7 +33,7 @@ namespace ChatWebApplication.API.Controllers
                     QueueMetaData queueMeta = new QueueMetaData();
                     queueMeta.ClientID = request.ChatQueueKey;
                     queueMeta.Function = Common.Constants.MessageFunctionType.Start;
-
+                    queueMeta.Username = request.Username;
                     _messageQueueHelper.PushMessage<QueueMetaData>(_applicationConfig, queueMeta);
 
                     return Ok();
