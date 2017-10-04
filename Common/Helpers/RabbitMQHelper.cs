@@ -23,7 +23,7 @@ namespace Common
             using (var channel = connection.CreateModel())
             {
                 channel.QueueDeclare(queue: config.QueueName, durable: false, exclusive: false,
-                                     autoDelete: false, arguments: null);
+                                    autoDelete: false, arguments: null);
 
                 var body = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message));
 
@@ -41,7 +41,7 @@ namespace Common
             {
                 using (var channel = connection.CreateModel())
                 {
-                    //channel.QueueDeclare(queue: config.QueueName, durable: false, exclusive: false, autoDelete: false, arguments: null);
+                    channel.QueueDeclare(queue: config.QueueName, durable: false, exclusive: false, autoDelete: false, arguments: null);
 
                     var consumer = new EventingBasicConsumer(channel);
 
